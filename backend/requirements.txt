@@ -1,0 +1,9 @@
+flask
+flask-cors
+librosa
+soundfile
+numpy
+scipy
+matplotlib
+pytest
+python-dotenv
