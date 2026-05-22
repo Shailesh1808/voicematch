@@ -11,6 +11,8 @@ import os
 import tempfile
 from pathlib import Path
 
+import soundfile as sf
+
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -140,6 +142,13 @@ def compare():
     try:
         audio_file.save(tmp_file)
         tmp_file.close()
+
+        info = sf.info(str(tmp_path))
+        if info.duration > 15:
+            return jsonify({
+                "error": "recording_too_long",
+                "message": "Recording is too long. Please record no more than 15 seconds.",
+            }), 400
 
         user_embedding = audio_processor.extract_embedding(str(tmp_path))
         user_spectrogram = audio_processor.generate_spectrogram(str(tmp_path))

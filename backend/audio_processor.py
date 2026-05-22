@@ -30,7 +30,6 @@ N_MFCC = 40
 N_FFT = 2048
 HOP_LENGTH = 512
 MIN_DURATION_SECONDS = 2.0
-MAX_DURATION_SECONDS = 15.0
 MIN_VOICED_FRAMES = 20
 SILENCE_TRIM_DB = 20
 N_MELS = 128
@@ -134,12 +133,10 @@ def extract_embedding(audio_path: str) -> np.ndarray:
         # Step 2: load audio
         audio, _ = librosa.load(str(tmp_path), sr=SAMPLE_RATE, mono=True)
 
-        # Step 3: validate duration bounds
+        # Step 3: validate minimum duration
         duration = len(audio) / SAMPLE_RATE
         if duration < MIN_DURATION_SECONDS:
             raise AudioTooShortError("Recording is too short. Please record for at least 2 seconds.")
-        if duration > MAX_DURATION_SECONDS:
-            raise InvalidAudioError("Recording is too long. Please record no more than 15 seconds.")
 
         # Step 3b: reject recordings with insufficient raw energy before normalisation
         # amplifies them — after normalisation even sub-threshold noise reaches peak=1.
