@@ -1,35 +1,22 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Recorder from './components/Recorder'
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="w-full min-h-screen bg-white">
+      <div className="mx-auto max-w-2xl px-6 py-12">
+        <header className="mb-10">
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">VoiceMatch</h1>
+          <p className="text-base text-gray-500 mt-1">Discover which vocalist your voice resembles</p>
+        </header>
+
+        <main>
+          <Recorder />
+        </main>
+
+        <footer className="mt-12 text-center">
+          <p className="text-xs text-gray-400">Powered by MFCC audio analysis</p>
+        </footer>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
-
-export default App
