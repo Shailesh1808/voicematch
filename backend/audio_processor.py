@@ -136,15 +136,14 @@ def extract_embedding(audio_path: str) -> np.ndarray:
         # Step 3: validate minimum duration
         duration = len(audio) / SAMPLE_RATE
         if duration < MIN_DURATION_SECONDS:
-            raise AudioTooShortError("Recording must be at least 2 seconds")
+            raise AudioTooShortError("Recording is too short. Please record for at least 2 seconds.")
 
         # Step 3b: reject recordings with insufficient raw energy before normalisation
         # amplifies them — after normalisation even sub-threshold noise reaches peak=1.
         raw_rms = float(np.sqrt(np.mean(audio ** 2)))
         if raw_rms < MINIMUM_RMS_THRESHOLD:
             raise AudioTooShortError(
-                "Not enough audio detected. "
-                "Please record at least 2 seconds in a quiet environment."
+                "No audio detected. Please make sure your microphone is working and try again."
             )
 
         # Step 4: peak amplitude normalisation
@@ -156,7 +155,7 @@ def extract_embedding(audio_path: str) -> np.ndarray:
         # Step 5b: validate duration after trimming
         trimmed_duration = len(audio) / SAMPLE_RATE
         if trimmed_duration < MIN_DURATION_SECONDS:
-            raise AudioTooShortError("Recording must be at least 2 seconds long.")
+            raise AudioTooShortError("Recording contains too much silence. Please record at least 2 seconds of clear audio.")
 
         # Step 6: extract MFCCs
         mfcc = librosa.feature.mfcc(
@@ -185,8 +184,7 @@ def extract_embedding(audio_path: str) -> np.ndarray:
 
         if np.sum(voiced_mask) < MIN_VOICED_FRAMES:
             raise AudioTooShortError(
-                "Not enough audio detected. "
-                "Please record at least 2 seconds in a quiet environment."
+                "Recording contains too much background noise. Please try again in a quieter environment."
             )
 
         features = features[:, voiced_mask]
