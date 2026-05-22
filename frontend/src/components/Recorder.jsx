@@ -94,7 +94,7 @@ export default function Recorder() {
 
   async function handleRecordingStop() {
     if (durationRef.current < MIN_DURATION) {
-      setError('Recording too short. Please record for at least 2 seconds.')
+      setError('Recording is too short. Please record for at least 2 seconds.')
       setRecordingState('idle')
       setDuration(0)
       durationRef.current = 0

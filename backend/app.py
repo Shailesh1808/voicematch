@@ -123,6 +123,11 @@ def compare():
         return jsonify({"error": "no_audio", "message": "No audio file provided"}), 400
 
     audio_file = request.files["audio"]
+    logger.info(
+        "POST /api/compare — received audio file: %s, size: %s bytes",
+        audio_file.filename or "unnamed",
+        request.content_length or "unknown",
+    )
 
     original_filename = audio_file.filename or ""
     suffix = Path(original_filename).suffix if original_filename else ".webm"
@@ -142,19 +147,22 @@ def compare():
         results = similarity.rank_results(user_embedding, reference_embeddings, VOCALISTS)
         top_match = similarity.get_top_match(results)
 
+        logger.info("POST /api/compare → 200, top match: %s", top_match)
         return jsonify({
             "results": results,
             "top_match": top_match,
             "user_spectrogram": user_spectrogram,
         }), 200
 
-    except AudioTooShortError:
+    except AudioTooShortError as e:
+        logger.warning("AudioTooShortError: %s", str(e))
         return jsonify({
             "error": "recording_too_short",
             "message": "Recording must be at least 2 seconds long.",
         }), 400
 
-    except InvalidAudioError:
+    except InvalidAudioError as e:
+        logger.warning("InvalidAudioError: %s", str(e))
         return jsonify({
             "error": "invalid_audio",
             "message": "Could not process audio file. Please try again.",
