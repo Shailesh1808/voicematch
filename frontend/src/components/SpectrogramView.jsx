@@ -15,7 +15,7 @@ export default function SpectrogramView({ userSpectrogram, topMatchId }) {
 
   return (
     <div className="mt-8 pt-8 border-t border-gray-100">
-      <div className="grid grid-cols-2 gap-6">
+      <div className="flex flex-col gap-6">
         <div>
           <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">Your Voice</p>
           <div className="rounded-lg overflow-hidden border border-gray-100">

@@ -3,6 +3,7 @@ import SpectrogramView from './SpectrogramView'
 export default function ResultsView({ results }) {
   const { results: ranked, top_match, user_spectrogram } = results
   const topResult = ranked[0]
+  const maxPercentage = ranked[0].percentage
 
   return (
     <div className="w-full space-y-6">
@@ -46,7 +47,7 @@ export default function ResultsView({ results }) {
               <div className="mt-1.5 w-full bg-gray-100 rounded-full overflow-hidden" style={{ height: r.rank === 1 ? '8px' : '6px' }}>
                 <div
                   className="bg-black rounded-full h-full transition-all"
-                  style={{ width: `${r.percentage}%` }}
+                  style={{ width: `${(r.percentage / maxPercentage) * 100}%` }}
                 />
               </div>
             </div>
@@ -54,7 +55,7 @@ export default function ResultsView({ results }) {
             {/* Scores */}
             <div className="shrink-0 text-right">
               <p className="text-sm text-gray-600 w-12">{r.percentage.toFixed(1)}%</p>
-              <p className="text-xs text-gray-400 w-16">{r.similarity.toFixed(4)}</p>
+              <p className="text-xs text-gray-400 w-16">{Math.max(0, r.similarity).toFixed(4)}</p>
             </div>
           </div>
         ))}
