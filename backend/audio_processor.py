@@ -98,10 +98,11 @@ def extract_embedding(audio_path: str) -> np.ndarray:
       4. Peak-amplitude normalise.
       5. Trim leading/trailing silence.
       6. Extract 40 MFCCs.
-      7. Compute delta and delta-delta features; stack to (120, T).
-      8. Cepstral mean normalisation.
+      7. Compute delta and delta-delta features.
+      7b. Extract F0 pitch via YIN; convert to log scale; compute delta and delta-delta.
+      8. Stack all features to (123, T); apply cepstral mean normalisation.
       9. Energy-based voiced-frame filtering.
-      10. Mean-pool over voiced frames → (120,).
+      10. Mean-pool over voiced frames → (123,).
       11. L2 normalise.
 
     Parameters
@@ -112,7 +113,7 @@ def extract_embedding(audio_path: str) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        Unit vector of shape (120,) representing the vocal character.
+        Unit vector of shape (123,) representing the vocal character.
 
     Raises
     ------
@@ -166,10 +167,30 @@ def extract_embedding(audio_path: str) -> np.ndarray:
             hop_length=HOP_LENGTH,
         )
 
-        # Step 7: delta and delta-delta features → (120, T)
+        # Step 7: delta and delta-delta features
         delta = librosa.feature.delta(mfcc)
         delta2 = librosa.feature.delta(mfcc, order=2)
-        features = np.vstack([mfcc, delta, delta2])
+
+        # Step 7b: pitch (F0) features
+        f0 = librosa.yin(
+            audio,
+            fmin=librosa.note_to_hz('C2'),
+            fmax=librosa.note_to_hz('C7'),
+            frame_length=N_FFT,
+            hop_length=HOP_LENGTH,
+        )
+        log_f0 = np.log1p(f0)
+        log_f0_row = np.reshape(log_f0, (1, -1))
+        log_f0_delta = librosa.feature.delta(log_f0_row)
+        log_f0_delta2 = librosa.feature.delta(log_f0_row, order=2)
+
+        # Align frame count — YIN and STFT padding can differ by one frame
+        n_frames = mfcc.shape[1]
+        log_f0_row = log_f0_row[:, :n_frames]
+        log_f0_delta = log_f0_delta[:, :n_frames]
+        log_f0_delta2 = log_f0_delta2[:, :n_frames]
+
+        features = np.vstack([mfcc, delta, delta2, log_f0_row, log_f0_delta, log_f0_delta2])
 
         # Step 8: cepstral mean normalisation
         features = features - np.mean(features, axis=1, keepdims=True)
