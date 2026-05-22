@@ -110,8 +110,10 @@ export default function Recorder() {
       setResults(data)
       setRecordingState('done')
     } catch (err) {
-      if (err.error === 'recording_too_short') {
-        setError('Recording too short. Please record for at least 2 seconds.')
+      if (err.message) {
+        setError(err.message)
+      } else if (err.error === 'recording_too_short') {
+        setError('Recording is too short. Please record for at least 2 seconds.')
       } else if (err.error === 'invalid_audio') {
         setError('Could not process your recording. Please try again.')
       } else {

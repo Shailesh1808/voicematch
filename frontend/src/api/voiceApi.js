@@ -7,7 +7,7 @@ export async function compareVoice(audioBlob) {
   })
   const data = await response.json()
   if (!response.ok) {
-    throw { status: response.status, ...data }
+    throw data
   }
   return data
 }
