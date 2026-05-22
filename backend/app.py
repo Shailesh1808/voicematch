@@ -94,7 +94,8 @@ def precompute_references() -> None:
 precompute_references()
 
 app = Flask(__name__)
-CORS(app, origins=["https://voicematch-mu.vercel.app"])
+# CORS(app, origins=["https://voicematch-mu.vercel.app/"])
+CORS(app, origins="*")
 
 
 @app.route("/api/health", methods=["GET"])
