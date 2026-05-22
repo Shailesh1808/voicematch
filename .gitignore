@@ -10,7 +10,7 @@ node_modules/
 dist/
 
 # Reference data
-reference_data/*.wav
+# reference_data/*.wav
 
 # OS
 .DS_Store
