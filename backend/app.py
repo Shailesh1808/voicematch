@@ -11,7 +11,7 @@ import os
 import tempfile
 from pathlib import Path
 
-import soundfile as sf
+import subprocess
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
@@ -144,12 +144,17 @@ def compare():
         audio_file.save(tmp_file)
         tmp_file.close()
 
-        info = sf.info(str(tmp_path))
-        if info.duration > 15:
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration", 
+             "-of", "default=noprint_wrappers=1:nokey=1", str(tmp_path)],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        duration = float(probe.stdout.decode().strip() or 0)
+        if duration > 15:
             return jsonify({
                 "error": "recording_too_long",
                 "message": "Recording is too long. Please record no more than 15 seconds.",
-            }), 400
+                }), 400
 
         user_embedding = audio_processor.extract_embedding(str(tmp_path))
         user_spectrogram = audio_processor.generate_spectrogram(str(tmp_path))

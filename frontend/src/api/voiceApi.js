@@ -1,4 +1,4 @@
-const BASE_URL = 'https://voicematch-production.up.railway.app'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export async function compareVoice(audioBlob) {
   const formData = new FormData()
