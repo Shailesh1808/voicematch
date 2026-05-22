@@ -158,14 +158,14 @@ def compare():
         logger.warning("AudioTooShortError: %s", str(e))
         return jsonify({
             "error": "recording_too_short",
-            "message": "Recording must be at least 2 seconds long.",
+            "message": str(e),
         }), 400
 
     except InvalidAudioError as e:
         logger.warning("InvalidAudioError: %s", str(e))
         return jsonify({
             "error": "invalid_audio",
-            "message": "Could not process audio file. Please try again.",
+            "message": str(e),
         }), 400
 
     except Exception:
