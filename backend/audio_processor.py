@@ -16,7 +16,7 @@ import tempfile
 from pathlib import Path
 
 import librosa
-import librosa.display
+import librosa.display 
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,6 +33,7 @@ MIN_DURATION_SECONDS = 2.0
 MIN_VOICED_FRAMES = 10
 SILENCE_TRIM_DB = 20
 N_MELS = 128
+MINIMUM_RMS_THRESHOLD = 0.01
 
 
 class AudioTooShortError(Exception):
@@ -137,11 +138,25 @@ def extract_embedding(audio_path: str) -> np.ndarray:
         if duration < MIN_DURATION_SECONDS:
             raise AudioTooShortError("Recording must be at least 2 seconds")
 
+        # Step 3b: reject recordings with insufficient raw energy before normalisation
+        # amplifies them — after normalisation even sub-threshold noise reaches peak=1.
+        raw_rms = float(np.sqrt(np.mean(audio ** 2)))
+        if raw_rms < MINIMUM_RMS_THRESHOLD:
+            raise AudioTooShortError(
+                "Not enough audio detected. "
+                "Please record at least 2 seconds in a quiet environment."
+            )
+
         # Step 4: peak amplitude normalisation
         audio = audio / (np.max(np.abs(audio)) + 1e-9)
 
         # Step 5: trim leading/trailing silence
         audio, _ = librosa.effects.trim(audio, top_db=SILENCE_TRIM_DB)
+
+        # Step 5b: validate duration after trimming
+        trimmed_duration = len(audio) / SAMPLE_RATE
+        if trimmed_duration < MIN_DURATION_SECONDS:
+            raise AudioTooShortError("Recording must be at least 2 seconds long.")
 
         # Step 6: extract MFCCs
         mfcc = librosa.feature.mfcc(
@@ -162,13 +177,16 @@ def extract_embedding(audio_path: str) -> np.ndarray:
 
         # Step 9: energy-based frame filtering
         rms = librosa.feature.rms(y=audio, hop_length=HOP_LENGTH)[0]
-        threshold = np.mean(rms) - np.std(rms)
+        threshold = max(
+            float(np.mean(rms) - np.std(rms)),
+            MINIMUM_RMS_THRESHOLD
+        )
         voiced_mask = rms > threshold
 
         if np.sum(voiced_mask) < MIN_VOICED_FRAMES:
             raise AudioTooShortError(
-                "Not enough singing detected. "
-                "Please record at least 2 seconds of clear singing."
+                "Not enough audio detected. "
+                "Please record at least 2 seconds in a quiet environment."
             )
 
         features = features[:, voiced_mask]
