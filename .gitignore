@@ -17,6 +17,6 @@ dist/
 .claude/
 
 # Internal design documents
-"CLAUDE.md" 
-"AUDIO_PIPELINE.md" 
-"SYSTEM_DESIGN.md" 
+CLAUDE.md
+AUDIO_PIPELINE.md 
+SYSTEM_DESIGN.md
