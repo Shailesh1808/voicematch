@@ -14,4 +14,9 @@ dist/
 
 # OS
 .DS_Store
-.claude/ 
+.claude/
+
+# Internal design documents
+"CLAUDE.md" 
+"AUDIO_PIPELINE.md" 
+"SYSTEM_DESIGN.md" 
