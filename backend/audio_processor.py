@@ -89,7 +89,7 @@ def convert_to_wav(input_path: str, output_path: str) -> None:
 
 
 def extract_embedding(audio_path: str) -> np.ndarray:
-    """Extract a 120-dimensional L2-normalised MFCC embedding from an audio file.
+    """Extract a 123-dimensional L2-normalised MFCC embedding from an audio file.
 
     Runs the full VoiceMatch pipeline:
       1. Convert to 16 kHz mono WAV via ffmpeg.
@@ -140,7 +140,7 @@ def extract_embedding(audio_path: str) -> np.ndarray:
             raise AudioTooShortError("Recording is too short. Please record for at least 2 seconds.")
 
         # Step 3b: reject recordings with insufficient raw energy before normalisation
-        # amplifies them — after normalisation even sub-threshold noise reaches peak=1.
+        # After normalisation, even sub-threshold noise reaches peak=1.
         raw_rms = float(np.sqrt(np.mean(audio ** 2)))
         if raw_rms < MINIMUM_RMS_THRESHOLD:
             raise AudioTooShortError(

@@ -69,7 +69,7 @@ def rank_results(
     Parameters
     ----------
     user_embedding : np.ndarray
-        L2-normalised embedding of shape (120,) for the user recording.
+        L2-normalised embedding of shape (123,) for the user recording.
     reference_embeddings : dict[str, np.ndarray]
         Mapping of vocalist ID (e.g. "sample_1") to its L2-normalised
         embedding. Order must be consistent with vocalist_metadata.

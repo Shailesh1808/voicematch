@@ -51,7 +51,7 @@ class TestExtractEmbedding:
 
     def test_returns_correct_shape(self, real_wav):
         embedding = extract_embedding(real_wav)
-        assert embedding.shape == (120,)
+        assert embedding.shape == (123,)
 
     def test_returns_unit_vector(self, real_wav):
         embedding = extract_embedding(real_wav)

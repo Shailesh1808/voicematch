@@ -9,9 +9,10 @@ All audio processing is delegated to audio_processor.py and similarity.py.
 import logging
 import os
 import tempfile
+import subprocess
 from pathlib import Path
 
-import subprocess
+
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
@@ -25,7 +26,7 @@ load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s — %(message)s",
+    format="%(asctime)s %(levelname)s %(name)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -94,7 +95,6 @@ def precompute_references() -> None:
 precompute_references()
 
 app = Flask(__name__)
-# CORS(app, origins=["https://voicematch-mu.vercel.app/"])
 CORS(app, origins="*")
 
 
@@ -108,7 +108,7 @@ def health():
 def compare():
     """Accept a user audio upload and return ranked vocalist similarity results.
 
-    Expects multipart/form-data with a field named "audio". Extracts an MFCC
+    Expects multipart/form-data with a field named "audio". Extracts MFCC and F0
     embedding, ranks it against all loaded reference profiles, and returns the
     sorted results alongside the user's mel spectrogram as a base64 PNG.
 
@@ -127,7 +127,7 @@ def compare():
 
     audio_file = request.files["audio"]
     logger.info(
-        "POST /api/compare — received audio file: %s, size: %s bytes",
+        "POST /api/compare - received audio file: %s, size: %s bytes",
         audio_file.filename or "unnamed",
         request.content_length or "unknown",
     )
